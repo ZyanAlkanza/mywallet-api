@@ -1,23 +1,42 @@
-import { prisma } from '@/lib/db';
-import { userSchema } from '@/lib/validation';
-import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db'
+import { userSchema } from '@/lib/validation'
+import { NextRequest, NextResponse } from 'next/server'
+import { handleCors } from '@/lib/cors'
 
-export async function GET() {
-  const users = await prisma.users.findMany();
-  return NextResponse.json(users);
+export async function GET(req: NextRequest) {
+  const headers = handleCors(req)
+  if (headers instanceof NextResponse) return headers
+
+  const users = await prisma.users.findMany()
+  return new NextResponse(JSON.stringify(users), {
+    status: 200,
+    headers,
+  })
 }
 
-export async function POST(req: Request) {
-  const body = await req.json();
+export async function POST(req: NextRequest) {
+  const headers = handleCors(req)
+  if (headers instanceof NextResponse) return headers
 
-  const parsed = userSchema.safeParse(body);
+  const body = await req.json()
+  const parsed = userSchema.safeParse(body)
+
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error }, { status: 400 });
+    return new NextResponse(
+      JSON.stringify({ error: parsed.error }),
+      { status: 400, headers }
+    )
   }
 
-  const user = await prisma.users.create({
-    data: parsed.data,
-  });
+  const user = await prisma.users.create({ data: parsed.data })
 
-  return NextResponse.json(user, { status: 201 });
+  return new NextResponse(JSON.stringify(user), {
+    status: 201,
+    headers,
+  })
+}
+
+// Optional: handle OPTIONS request directly
+export function OPTIONS(req: NextRequest) {
+  return handleCors(req)
 }
