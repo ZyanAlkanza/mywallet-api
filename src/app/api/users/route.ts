@@ -35,8 +35,3 @@ export async function POST(req: NextRequest) {
     headers,
   })
 }
-
-// Optional: handle OPTIONS request directly
-export function OPTIONS(req: NextRequest) {
-  return handleCors(req)
-}
