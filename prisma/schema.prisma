@@ -67,3 +67,16 @@ model Wallets {
   user              Users? @relation(fields: [user_id], references: [id])
   @@map("tbl_wallets")
 }
+
+model Emas {
+  id              Int     @id @default(autoincrement())
+  nama            String
+  tgl_transaksi   DateTime
+  gramasi         Float
+  harga_beli      Float
+  harga_jual      Float
+  status          String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+  @@map("tbl_emas")
+}
