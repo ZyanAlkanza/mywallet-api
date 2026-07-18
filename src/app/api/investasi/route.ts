@@ -7,7 +7,11 @@ export async function GET(req: NextRequest) {
   const headers = handleCors(req)
   if (headers instanceof NextResponse) return headers
 
-  const emas = await prisma.emas.findMany()
+  const emas = await prisma.emas.findMany({
+    orderBy: {
+      tgl_transaksi: 'asc'
+    }
+  })
   return new NextResponse(JSON.stringify(emas), {
     status: 200,
     headers,
