@@ -12,10 +12,47 @@ export async function GET(req: NextRequest) {
       tgl_transaksi: 'asc'
     }
   })
-  return new NextResponse(JSON.stringify(emas), {
-    status: 200,
-    headers,
+
+
+  const totalTransaksi = emas.length;
+  
+  let totalGramasi = 0;
+  emas.forEach((item) => {
+    if (item.status === 'Beli') {
+      totalGramasi += Number(item.gramasi || 0)
+    } else if (item.status === 'Jual') {
+      totalGramasi -= Number(item.gramasi || 0)
+    }
   })
+  totalGramasi = Number(totalGramasi.toFixed(5));
+
+  let totalBeli = 0;
+  emas.forEach((item) => {
+    if (item.status === 'Beli') {
+      totalBeli += Number(item.harga_beli || 0)
+    }
+  })
+
+  let totalJual = 0;
+  emas.forEach((item) => {
+    if (item.status === 'Jual') {
+      totalJual += Number(item.harga_jual || 0)
+    }
+  })
+
+  return new NextResponse(
+    JSON.stringify({
+      data: emas,
+      total_gramasi: totalGramasi,
+      total_transaksi: totalTransaksi,
+      total_beli: totalBeli,
+      total_jual: totalJual,
+    }),
+    {
+      status: 200,
+      headers,
+    }
+  )
 }
 
 export async function POST(req: NextRequest) {
