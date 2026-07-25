@@ -83,6 +83,39 @@ export async function POST(req: NextRequest) {
   })
 }
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const headers = handleCors(req)
+    if (headers instanceof NextResponse) return headers
+
+    const body = await req.json()
+    const { id } = body
+
+    if (!id) {
+      return NextResponse.json(
+        { message: 'ID wajib diisi' },
+        { status: 400 }
+      )
+    }
+
+    await prisma.emas.delete({
+      where: { id: Number(id) }
+    })
+
+    return new NextResponse(JSON.stringify(id), {
+      status: 200,
+      headers,
+    })
+  } catch (err: any) {
+    console.error(err)
+
+    return NextResponse.json(
+      { message: 'Error', error: err.message },
+      { status: 500 }
+    )
+  }
+}
+
 export async function OPTIONS(req: Request) {
   return new Response(null, {
     status: 200,
